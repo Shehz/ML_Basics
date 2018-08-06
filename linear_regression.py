@@ -1,29 +1,32 @@
 from __future__ import print_function,division
 
 import torch
-import matplotlib.pyplot as plt
+
+
 """
 Linear Regression
 """
 
 import numpy as np
 
+from matplotlib import pyplot as plt
+
+
 device = torch.device('cuda')
 dtype = torch.float
 
 
-np.random.seed(42)
-pts = 50
-
 """
 #Randomly generated data
 
+np.random.seed(42)
+pts = 50
 x_vals = np.random.rand(2,50)
-x_train = np.asarray(x_vals,dtype=np.float32).reshape(-1,1)
+xtrain_array = np.asarray(x_vals,dtype=np.float32).reshape(-1,1)
 m = 1
 alpha = np.random.rand(1)
 beta = np.random.rand(1)
-y_correct = np.asarray([2*i+m for i in x_vals], dtype=np.float32).reshape(-1,1)
+ytrain_array = np.asarray([2*i+m for i in x_vals], dtype=np.float32).reshape(-1,1)
 """
 
 def processingCsv(csv_path):
@@ -67,7 +70,7 @@ class LinearRegression(object):
 
 
 def run(csv_path,test_csv_path):
-    x_array,y_array =  processingCsv(csv_path)
+    xtrain_array,ytrain_array =  processingCsv(csv_path)
     xtest_array, ytest_array = processingCsv(test_csv_path)
     num_epochs = 2000
     learning_rate = 0.0001
@@ -76,9 +79,9 @@ def run(csv_path,test_csv_path):
 
     linregression = LinearRegression(learning_rate,num_feature,batch_size)
     for epoch  in range(num_epochs):
-        for idx in range(0,y_array.shape[0],batch_size):
-            x = torch.tensor(x_array[idx:batch_size+idx,:],device=device,dtype=dtype)
-            y = torch.tensor(y_array[idx:batch_size+idx,:],device=device,dtype=dtype)
+        for idx in range(0,ytrain_array.shape[0],batch_size):
+            x = torch.tensor(xtrain_array[idx:batch_size+idx,:],device=device,dtype=dtype)
+            y = torch.tensor(ytrain_array[idx:batch_size+idx,:],device=device,dtype=dtype)
             loss= linregression.forward(x,y,batch_size)
             linregression.backward(loss)
         if (epoch+1) % 100 ==0:
@@ -90,6 +93,7 @@ def run(csv_path,test_csv_path):
     for idx in range(50):
 
         print('Actual output is  {:f} ---> Predicted output is  {:f}'.format(y_predict_test[idx,0].item(), ytest_array[idx,0]))
+
 
 if __name__ =="__main__":
     csv_path = "./data/regression/train_kaggle.csv"
